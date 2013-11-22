@@ -2,7 +2,10 @@ import java.util.Scanner;
 import java.util.Arrays;
 
 public class Matrix {
-	public static void main(String[] args) {
+
+private double[][] theMatrix;
+
+/**	public static void main(String[] args) {
 		//test();
 		Scanner sc = new Scanner(System.in);
 		double myMatrix[][] = createMatrix(sc);
@@ -26,6 +29,21 @@ public class Matrix {
 //		printMatrix(transposeMatrix(myMatrix));
 //		System.out.p/rintln("Inverted:");
 //		printMatrix(invertMatrix(myMatrix));
+	}
+**/
+
+	public Matrix() {
+		Scanner sc = new Scanner(System.in);
+		theMatrix = createMatrix(sc);
+		theMatrix = assignValues(sc, theMatrix);
+	}
+
+	public Matrix(double[][] matrix) {
+		theMatrix = matrix;
+	}
+
+	public double[][] getMatrix() {
+		return theMatrix;
 	}
 
 	public static void printMatrix(double matrix[][]) {
@@ -128,7 +146,33 @@ public class Matrix {
 		}
 		return identity;
 	}
+
+	public static boolean canAdd(double[][] aMatrix, double[][] bMatrix) {
+		return aMatrix.length == bMatrix.length && aMatrix[0].length == bMatrix[0].length;
+	}
+
+	public static double[][] addTwoMatrices(double[][] aMatrix, double[][] bMatrix) {
+		if (!canAdd(aMatrix, bMatrix)) throw new IllegalArgumentException("Cannot add matrices.");
+		double[][] newMatrix = new double[aMatrix.length][aMatrix[0].length];
+		for (int i = 0; i < newMatrix.length; i++) {
+			for (int j = 0; j < newMatrix[0].length; j++) {
+				newMatrix[i][j] = aMatrix[i][j] + bMatrix[i][j];
+			}
+		}
+
+		return newMatrix;
+	}
 	
+	public static double[][] multiplyScalar(double[][] matrix, double scalar) {
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				matrix[i][j] = matrix[i][j] * scalar;
+			}
+		}
+
+		return matrix;
+	}
+
 	public static boolean canMultiply(double[][] firstMatrix, double[][] secondMatrix) {
 		if (firstMatrix[0].length == secondMatrix.length) {
 			return true;
