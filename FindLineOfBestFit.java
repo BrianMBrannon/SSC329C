@@ -13,5 +13,11 @@ public class FindLineOfBestFit {
 		Matrix.printMatrix(xVector.getMatrix());
 		System.out.println("b: ");
 		Matrix.printMatrix(bVector.getMatrix());
+		System.out.println("Th eline of best fit is: ");
+		System.out.print(solution[0][0]);
+		for (int i = 1; i < solution.length; i++) {
+			System.out.print(" + " + solution[i][0]);
+			System.out.println("*" + (char)(i+ 96) + "^" + i);
+		}
 	} 
 }
