@@ -1,6 +1,10 @@
 /*
  * The current purpose of this class will be to display the matrix in terms of fractions
  * rather than doubles which aren't exactly accurate.
+ * For applied purposes I have in mind exact values are not important, but when displaying
+ * values to the user it's preferred they're exact.
+ * This is implemented here, after an imprecise value is likely given, because doing so in
+ * the actual Matrix class would prove to be unnessecary.  
 */
 
 
@@ -9,24 +13,31 @@ public class MathSupport {
 	//how many zeros signify an error?
 	public final static int MAX_ZEROS = 3;
 	//how many repititions signifiy a 1/3 equivalent?
-//	public final static int MAX_TIMES_REPEATED = 4;
+	public final static int MAX_TIMES_REPEATED = 5;
 
 	public static void main(String[] args) {
 		double number = 3.1250000000;
 		System.out.println("Convert this to a fraction: " + number);
 		System.out.println(convert(number));
+		double num2 = 1.24242222222;
+		System.out.println(num2 + "" + checkRepeat(num2));
+		System.out.println("Convert that to a fraction: " + convert(num2));
 	}
 
 	public static String convert(double number) {
-		number = eliminateError(number);
-		int denom = (int)Math.pow(10, numDecPoints(number));
-		int num = (int)(number * denom);
-		int GCD = findGCD(num, denom);
-
-		num /= GCD;
-		denom /= GCD;
-
-		return (num + "/" + denom);
+		int whereRepeated = checkRepeat(number);
+		if (whereRepeated != 0) {
+			return repeatToFraction(number, whereRepeated);
+		}
+		else {
+			number = eliminateError(number);
+			int denom = (int)Math.pow(10, numDecPoints(number));
+			int num = (int)(number * denom);
+			int GCD = findGCD(num, denom);
+			num /= GCD;
+			denom /= GCD;
+			return (num + "/" + denom);
+		}
 	}
 
 	/**
@@ -34,6 +45,54 @@ public class MathSupport {
 	 * Find way to deal with numbers such as 8/7.
 	 * Find way to recognize irrational numbers.
 	**/
+
+	//Is there a repeating amount of characters?  Where do they begin?
+	public static int checkRepeat(double number) {
+		String myNum = Double.toString(number);
+		char repeat;
+		int beginAt = 0;
+		int repeatCount = -1;
+
+		for (int i = 0; i < myNum.length(); i++) {
+		//only consider past the decimal point
+			if (myNum.charAt(i) == '.') {
+				repeat = myNum.charAt(i + 1);
+				beginAt = i + 1;
+				for (int j = i + 1; j < myNum.length(); j++) {
+					if (myNum.charAt(j) == repeat) {
+						repeatCount++;
+						if (repeatCount == MAX_TIMES_REPEATED) {
+							return beginAt;
+						}
+					}
+					else {
+						beginAt = j - 1; //zero based indexing
+						repeatCount = 0;
+						repeat = myNum.charAt(j);
+					}
+				}
+				break;
+			}
+		}		
+
+		return -1;
+	}
+
+	public static String repeatToFraction(double number,int indexRepeated) {
+		int decPointsMult = (int) Math.pow(10, indexRepeated);
+		System.out.println("DecPointsMult: " + decPointsMult);
+		if (decPointsMult == 0) decPointsMult = 1;
+		//double num = number * 9
+		double num = ((int)(number * 9 * decPointsMult) / decPointsMult);
+		System.out.println("num : " + num);
+		int denom = 9;
+		if (num % 1 == 0) {
+			int GCD = findGCD((int)num, denom);
+			num /= (GCD * decPointsMult);
+			denom /= (GCD * decPointsMult);
+		}
+		return (num + "/" + denom);
+	}
 
 	/**
 	 * The below will not work for small numbers (i.e. 1.27*10^-9).  This should not happen
